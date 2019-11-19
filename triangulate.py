@@ -1,69 +1,79 @@
-from rpc_triangulate_solver.triangulate_worker import triangulate_worker
 import os
 import json
 import numpy as np
-import logging
-import multiprocessing
-import shutil
+import json
+from rpc_model import RPCModel, affine_approx
+import tempfile
 
+# meta_file is a json
+# bbx_file is a json
+# track_file is a text file
+def triangulate(meta_file, bbx_file, track_file, out_file):
+    with open(meta_file) as fp:
+        metas = json.load(fp)
 
-def triangulate(meta_file, affine_file, track_file, out_file, tmp_dir):
-    if not os.path.exists(tmp_dir):
-        os.mkdir(tmp_dir)
+    img_names = sorted(metas.keys())
+    img_name2id = dict([(img_names[i], i) for i in range(len(img_names))])
 
-    with open(track_file) as fp:
-        all_tracks = json.load(fp)
+    with open(bbx_file) as fp:
+        bbx = json.load(fp)
+        bbx = (bbx['lat_min'], bbx['lat_max'], bbx['lon_min'], bbx['lon_max'], bbx['alt_min'], bbx['alt_max'])
 
-    pid = os.getpid()
+    rpc_cameras = []
+    affine_cameras = []
+    for name in img_names:
+        rpc_cam = RPCModel(metas[name])
+        rpc_cameras.append(rpc_cam)
 
-    # split all_tracks into multiple chunks
-    process_cnt = multiprocessing.cpu_count()
-    process_list = []
+        # apprximate the rpc camera with an affine one in a local area
+        affine_cam = affine_approx(rpc_cam, bbx)
+        affine_cameras.append(list(affine_cam.flatten()))
 
-    chunk_size = int(len(all_tracks) / process_cnt)
-    chunks = [[j*chunk_size, (j+1)*chunk_size] for j in range(process_cnt)]
-    chunks[-1][1] = len(all_tracks)
-    track_file_list = []
-    result_file_list = []
-    for i in range(process_cnt):
-        track_file = os.path.join(tmp_dir, 'rpc_triangulate_tracks_{}_{}.txt'.format(pid, i))
-        track_file_list.append(track_file)
-        with open(track_file, 'w') as fp:
-            idx1 = chunks[i][0]
-            idx2 = chunks[i][1]
-            json.dump(all_tracks[idx1:idx2], fp)
-        tmp_file = os.path.join(tmp_dir, 'rpc_triangulate_tmpfile_{}_{}.txt'.format(pid, i))
-        result_file = os.path.join(tmp_dir, 'rpc_triangulate_points_{}_{}.npy'.format(pid, i))
-        result_file_list.append(result_file)
+    tmpdir = tempfile.TemporaryDirectory()
+    # write rpc cameras
+    camera_fname = os.path.join(tmpdir.name, 'rpc_cameras.txt')
+    with open(camera_fname, 'w') as fp:
+        fp.write('{}\n'.format(len(rpc_cameras)))
+        for i in range(len(rpc_cameras)):
+            fp.write('{}\n'.format(i))
+            string = rpc_cameras[i].to_string()
+            string += ' '.join([str(x) for x in affine_cameras[i]])
+            fp.write(string + '\n')
 
-        p = multiprocessing.Process(target=triangulate_worker, args=(result_file, meta_file, affine_file, track_file, tmp_file))
-        process_list.append(p)
-        p.start()
+    # write feature tracks
+    lines_to_write = []
+    with open(track_file) as fp_in:
+        track_cnt = int(fp_in.readline().strip())
+        lines_to_write.append('{}\n'.format(track_cnt))
+        for i in range(track_cnt):
+            line = fp_in.readline().strip().split(' ')
+            if len(line) == 0:
+                continue
+            assert ((len(line) - 1) % 3 == 0)
+            pixels_cnt = int(line[0])
 
-    for p in process_list:
-        p.join()
+            string = '{}'.format(pixels_cnt)
+            line = line[1:]
+            for j in range(pixels_cnt):
+                name = line[3 * j].strip()
+                col = line[3 * j + 1].strip()
+                row = line[3 * j + 2].strip()
+                string += ' {} {} {}'.format(img_name2id[name], col, row)
+            lines_to_write.append(string + '\n')
 
-    # read result_files
-    points = []
-    for result_file in result_file_list:
-        points.append(np.load(result_file))
-    points = np.vstack(tuple(points))
+    track_fname = os.path.join(tmpdir.name, 'feature_tracks.txt')
+    with open(track_fname, 'w') as fp:
+        fp.writelines(lines_to_write)
 
-    np.savetxt(out_file, points, header='# format: lat, lon, alt, reproj_err')
+    # now launch the C++ program
+    cmd = './multi_rpc_triangulate/build/multi_rpc_triangulate {} {} {}'.format(camera_fname, track_fname, out_file)
+    os.system(cmd)
 
-    # remove all track_file
-    shutil.rmtree(tmp_dir)
-
+    tmpdir.cleanup()
 
 if __name__ == '__main__':
-    from lib.logger import GlobalLogger
-    logger = GlobalLogger()
-    logger.turn_on_terminal()
-
-    folder = '/data2/kz298/satellite_stereo/rpc_triangulate_solver/example/'
-    meta_file = os.path.join(folder, 'metas.json')
-    affine_file = os.path.join(folder, 'affine_latlonalt.json')
-    track_file = os.path.join(folder, 'kai_tracks.json')
-    out_file = os.path.join(folder, 'points.txt')
-    tmp_dir = os.path.join(folder, 'tmp')
-    triangulate(meta_file, affine_file, track_file, out_file, tmp_dir)
+    meta_file = './example/metas.json'
+    bbx_file = './example/bbx.json'
+    track_file = './example/tracks.txt'
+    out_file = './example/results.txt'
+    triangulate(meta_file, bbx_file, track_file, out_file)
