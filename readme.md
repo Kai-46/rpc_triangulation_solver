@@ -23,7 +23,7 @@ cd multi_rpc_triangulate && mkdir build && cd build && cmake .. && make
 * the python interface "triangulate.py" uses python3 instead of python2; it requires the minimal dependency: numpy
 
 ## Quick Start
-The folder "example/" contains two example input configuration files: "metas.json" for specifying RPC camera parameters and image sizes, "tracks.txt" for specifying feature tracks. You can triangulate this example by typing:
+The folder "example/" contains three example input configuration files: "metas.json" for specifying RPC camera parameters and image sizes, "tracks.txt" for specifying feature tracks, "bbx.json" for specifying the local area in which the RPC models will be linearized. You can triangulate this example by typing:
 ```{r, engine='bash'}
 python3 triangulate.py
 ```
@@ -42,6 +42,10 @@ The format of the input file "metas.json" is,
          "width": , "height": }
 ...
 }
+```
+The format of the input file "bbx.json" is,
+```{r, engine='bash'}
+"lat_min": , "lat_max": , "lon_min": , "lon_max": , "alt_min": , "alt_max": 
 ```
 The format of the input file "tracks.txt" is,
 ```{r, engine='bash'}
