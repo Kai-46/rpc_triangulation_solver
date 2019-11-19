@@ -1,4 +1,4 @@
-# Triangulation Solver for the RPC Model used in Satellite Images
+# Triangulation Solver for the RPC Model in Satellite Images
 
 ## Introduction
 An RPC model maps a 3D point (lat, lon, alt) to a pixel (col, row) in a satellite image. It is a non-linear mapping. 
