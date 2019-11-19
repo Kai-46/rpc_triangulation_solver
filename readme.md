@@ -24,19 +24,25 @@ cd multi_rpc_triangulate && mkdir build && cd build && cmake .. && make
 The folder "example/" contains two example input configuration files: "metas.json" for specifying RPC camera parameters and image sizes, "tracks.txt" for specifying feature tracks. 
 
 The format of "metas.json" is,
-
 ```{r, engine='bash'}
 {
 "img1": {"rpc": {"colNum": [], "colDen": [], "rowNum": [], "rowDen": [], 
-                 "latOff": , "latScale": , "lonOff": , "lonScale": , "latOff": , "latScale": , 
+                 "latOff": , "latScale": , "lonOff": , "lonScale": , "altOff": , "altScale": , 
                  "colOff": , "colScale": , "rowOff": , "rowScale": }, 
          "width": , "height": },
 "img2": {"rpc": {"colNum": [], "colDen": [], "rowNum": [], "rowDen": [], 
-                 "latOff": , "latScale": , "lonOff": , "lonScale": , "latOff": , "latScale": , 
+                 "latOff": , "latScale": , "lonOff": , "lonScale": , "altOff": , "altScale": , 
                  "colOff": , "colScale": , "rowOff": , "rowScale": }, 
          "width": , "height": }
+...
 }
 ```
-
+The format of "tracks.txt" is,
+```{r, engine='bash'}
+number of tracks
+track_length img1 col row img2 col row img3 col row ...
+track_length img1 col row img2 col row ...
+...
+```
 
 
