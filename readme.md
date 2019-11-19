@@ -9,9 +9,9 @@ For a specific 3D point, if you have multiple observations in different images (
 
 The triangulation solver basically operates in three steps:
 
-* linearize each RPC model in a local area, or you can say 'locally approxmiate each RPC model with an affine model';
-* solve a linear system to get an initial guess of the 3D point's coordinates;
-* then, use [Ceres](http://ceres-solver.org/) to iteratively refine the initial guess by minimizing the average reprojection error.
+1. linearize each RPC model in a local area, or you can say 'locally approxmiate each RPC model with an affine model';
+2. solve a linear system to get an initial guess of the 3D point's coordinates;
+3. then, use [Ceres](http://ceres-solver.org/) to iteratively refine the initial guess by minimizing the average reprojection error.
 
 ## Installation
 
