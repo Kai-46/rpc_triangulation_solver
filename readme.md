@@ -13,7 +13,11 @@ The triangulation solver basically operates in three steps:
 
 ## Installation
 
-
+* install [ceres](http://ceres-solver.org/) and [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) on your machine
+* compile the C++ backbone 'multi_rpc_triangulate/' via:
+```{r, engine='bash'}
+cd multi_rpc_triangulate && mkdir build && cd build && cmake .. && make
+```
 
 
 
