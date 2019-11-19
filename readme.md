@@ -25,6 +25,7 @@ The folder "example/" contains two example input configuration files: "metas.jso
 ```{r, engine='bash'}
 python3 triangulate.py
 ```
+The solver will write the results to "example/results.txt". 
 
 The format of "metas.json" is,
 ```{r, engine='bash'}
