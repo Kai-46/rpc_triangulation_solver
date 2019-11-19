@@ -45,7 +45,7 @@ The format of the input file "metas.json" is,
 ```
 The format of the input file "bbx.json" is,
 ```{r, engine='bash'}
-"lat_min": , "lat_max": , "lon_min": , "lon_max": , "alt_min": , "alt_max": 
+{"lat_min": , "lat_max": , "lon_min": , "lon_max": , "alt_min": , "alt_max": }
 ```
 The format of the input file "tracks.txt" is,
 ```{r, engine='bash'}
