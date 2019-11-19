@@ -62,3 +62,5 @@ initial_lat initial_lon initial_alt inital_reproj_err final_lat final_lon final_
 ...
 ```
 
+## License
+This software uses the [3-clause BSD license](https://opensource.org/licenses/BSD-3-Clause).
