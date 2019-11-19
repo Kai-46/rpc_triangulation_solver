@@ -3,7 +3,7 @@
 ## Introduction
 An RPC model maps a 3D point (lat, lon, alt) to a pixel (col, row) in a satellite image. It is a non-linear mapping. 
 
-For a specific 3D point, if you have multiple observations in different images, then you can triangulate the 3D point's coordinates with RPC models. This repo implements this functionality.
+For a specific 3D point, if you have multiple observations in different images (called a feature track), then you can triangulate the 3D point's coordinates with RPC models. This repo implements this functionality.
 
 The triangulation solver basically operates in three steps:
 
