@@ -1,6 +1,19 @@
-## Triangulation solver for the RPC model used in satellite images
+# Triangulation Solver for the RPC Model used in Satellite Images
 
-The triangulation solver requires the local linearization of RPC model as input. It basically operates in two steps.
+## Introduction
+An RPC model maps a 3D point (lat, lon, alt) to a pixel (col, row) in a satellite image. It is a non-linear mapping. 
 
-* solve a linear system to get a initial guess of the 3D point coordinates
-* then, use ceres to iteratively refine the initial guess by solving a non-linear least square problem
+For a specific 3D point, if you have multiple observations in different images, then you can triangulate the 3D point's coordinates with RPC models. This repo implements this functionality.
+
+The triangulation solver basically operates in three steps:
+
+* linearize each RPC model in a local area, or you can say 'locally approxmiate each RPC model with an affine model';
+* solve a linear system to get an initial guess of the 3D point's coordinates;
+* then, use [ceres](http://ceres-solver.org/) to iteratively refine the initial guess by minimizing the average reprojection error.
+
+## Installation
+
+
+
+
+
