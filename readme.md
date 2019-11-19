@@ -51,8 +51,8 @@ track_length img1 col row img2 col row ...
 The format of the output file "results.txt" is, 
 ```{r, engine='bash'}
 number_of_3D_points
-initial_lat, initial_lon, initial_alt, inital_reproj_err, final_lat, final_lon, final_alt, final_reproj_err
-initial_lat, initial_lon, initial_alt, inital_reproj_err, final_lat, final_lon, final_alt, final_reproj_err
+initial_lat initial_lon initial_alt inital_reproj_err final_lat final_lon final_alt final_reproj_err
+initial_lat initial_lon initial_alt inital_reproj_err final_lat final_lon final_alt final_reproj_err
 ...
 ```
 
